@@ -34,3 +34,21 @@ function operate(num1, num2, operation){
         return result;
     }
 }
+
+const grid = document.querySelector('.keys-grid');
+const display = document.querySelector('#display');
+
+grid.addEventListener('click', e => {
+    if(e.target.textContent === 'C')
+        display.textContent = '0';
+    else{
+        if(display.textContent == 0){
+            display.textContent = e.target.textContent;
+        } else {
+            display.textContent += e.target.textContent;
+        }
+
+        if(/[0-9]/.test(e.target.textContent))
+            console.log("num");
+    }
+});
