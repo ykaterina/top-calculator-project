@@ -23,32 +23,55 @@ function operate(num1, num2, operation){
         case "-":
             result = subtract(num1, num2);
             break;
-        case "*":
-            result = multiply(num1, num2);
+        case "x":
+            result = Math.round(multiply(num1, num2) * 100) / 100;
             break;
         case "/":
-            result = divide(num1, num2);
+            if(num2 === 0){
+                result = "What sorcery is this?!";
+                break;
+            }
+            result = Math.round(divide(num1, num2) * 100) / 100;
             break;
         default:
             console.log("ERR");
-        return result;
     }
+    return result;
+}
+
+function clearDisplay(){
+    display.textContent = '0';
+    num1 = 0, num2 = 0;
 }
 
 const grid = document.querySelector('.keys-grid');
 const display = document.querySelector('#display');
 
-grid.addEventListener('click', e => {
-    if(e.target.textContent === 'C')
-        display.textContent = '0';
-    else{
-        if(display.textContent == 0){
-            display.textContent = e.target.textContent;
-        } else {
-            display.textContent += e.target.textContent;
-        }
+let num1 = 0, num2 = 0;
+let operator;
+let lastKeyIsOperator = false;
 
-        if(/[0-9]/.test(e.target.textContent))
-            console.log("num");
+grid.addEventListener('click', e => {
+    if(e.target.nodeName === 'BUTTON'){
+        if(e.target.textContent === 'C'){
+            clearDisplay();
+        } else if (e.target.id == "eval") {
+            num2 = display.textContent;
+            display.textContent = operate(Number(num1), Number(num2), operator);
+            lastKeyIsOperator = true;
+        } else {
+            if(e.target.className.includes("key")){
+                lastKeyIsOperator = true;
+                num1 = display.textContent;
+                operator = e.target.textContent;
+            } else {
+                if(display.textContent == 0 || lastKeyIsOperator){
+                    display.textContent = e.target.textContent;
+                    lastKeyIsOperator = false;
+                } else {
+                    display.textContent += e.target.textContent;
+                }
+            }   
+        }
     }
 });
