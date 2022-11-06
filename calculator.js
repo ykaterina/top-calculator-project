@@ -44,7 +44,7 @@ function operate(num1, num2, operation){
 
 function clearDisplay(){
     display.textContent = '0';
-    history.textContent = '';
+    clearCurrentOperation();
     num1 = 0, num2 = 0, prevOp = false;
 }
 
@@ -71,14 +71,51 @@ function setPositiveNegative(){
 }
 
 function setDecimalPoint(numtext){
-    if(!numtext.includes("."))
-        numtext += ".";
-        
+    if(!equalSignIndForDec){
+        if(!numtext.includes("."))
+            numtext += ".";
+    } 
     return numtext;
 }
 
-function updateOperation(){   //this will update the history in display
+function updateOperation(key) {  
+    if(isNaN(key)){
+        if(key == '/' || key == '*')
+            key = changeOp(key);
+        current.textContent = `${num1} ${key}`;
+    } else
+        current.textContent += ` ${key}`;
+}
 
+function changeOp(operator){
+    if(operator == "*" || operator == "divide")
+        return "\u00d7";
+    else if (operator == "/" || operator == "multiply")
+        return "\u00f7";
+}
+
+function changeBtnOperator(operator){
+    let equivalentOp;
+    switch(operator){
+        case "add":
+            equivalentOp = '+';
+            break;
+        case "subtract":
+            equivalentOp = '-';
+            break;
+        case "multiply":
+            equivalentOp = '*';
+            break;
+        case "divide":
+            equivalentOp = '/';
+    }
+    return equivalentOp;
+}
+
+function clearCurrentOperation(){
+    current.textContent = "";
+    equalSignLast = false;
+    equalSignIndForDec = false;
 }
 
 function evaluate(numtext){
@@ -92,16 +129,19 @@ function evaluate(numtext){
     else 
         display.textContent = result;
    
-    num1 = result;
+        num1 = result;
+        // console.log("L101 result: "+result);
 }
+
+
 
 const grid = document.querySelector('.keys-grid');
 const display = document.querySelector('#display');
-const history = document.querySelector('#history');
+const current = document.querySelector('#history');
 
 let num1 = 0, num2 = 0;
-let operator;
-let lastKeyIsOperator = false, prevOp = false;
+let operator, op2;
+let lastKeyIsOperator = false, prevOp = false, equalSignLast = false, equalSignIndForDec = false;
 
 grid.addEventListener('click', e => {
     if(e.target.nodeName === 'BUTTON'){
@@ -111,7 +151,10 @@ grid.addEventListener('click', e => {
             deleteLast(display.textContent);
         } else if (e.target.id == "eval") { // equal
             // console.log("L107 num1: "+num1);
-            evaluate(display.textContent);
+            numtext = display.textContent;
+            evaluate(numtext);
+            updateOperation(numtext);
+            equalSignIndForDec = true;
             lastKeyIsOperator = true;
             prevOp = false;
         } else if (e.target.id == "posNeg") {
@@ -119,6 +162,7 @@ grid.addEventListener('click', e => {
         } else if(e.target.className.includes("key")){ //operators
             if(lastKeyIsOperator){
                 operator = e.target.id;
+                updateOperation(changeBtnOperator(operator));
             } else {
                 if (prevOp) {
                     // console.log("L118 num1: "+num1);
@@ -129,11 +173,13 @@ grid.addEventListener('click', e => {
 
                 lastKeyIsOperator = true;
                 operator = e.target.id;
-                // console.log(operator);
+                updateOperation(changeBtnOperator(operator));
                 prevOp = true;
             }
         } else if (e.target.id == "decipoint") {
             display.textContent = setDecimalPoint(display.textContent);
+        } else if(equalSignIndForDec) {
+            clearCurrentOperation();
         } else {
             if(display.textContent === "0" || lastKeyIsOperator){
                 display.textContent = e.target.textContent;
@@ -147,24 +193,28 @@ grid.addEventListener('click', e => {
 
 document.addEventListener('keydown', function(e){        
     if (e.key == 'Backspace') {
-            deleteLast(display.textContent);
+        deleteLast(display.textContent);
     } else if(e.key == '-' || e.key == '+' || e.key == '/' || e.key == '*'){ //operators
-        if(lastKeyIsOperator){
+        if(lastKeyIsOperator) {
             operator = e.key;
+            updateOperation(operator);
         } else {
             if (prevOp) {
                 evaluate(display.textContent);
-                console.log("L120 num1: "+num1);
+                // console.log("L120 num1: "+num1);
             } else {
                 num1 = display.textContent;
             }
             lastKeyIsOperator = true;
             operator = e.key;
+            updateOperation(operator);
             prevOp = true;
         }
     } else if (e.key == ".") {
         display.textContent = setDecimalPoint(display.textContent);
     } else if ((Number(e.key) >= 0 && Number(e.key) <= 9)) {
+        if(equalSignLast)
+            clearCurrentOperation();
         if(display.textContent === "0" || lastKeyIsOperator){
             display.textContent = e.key;
             lastKeyIsOperator = false;
@@ -172,8 +222,11 @@ document.addEventListener('keydown', function(e){
             display.textContent += e.key;
         }
     } else if (e.key == "=" || e.key == "Enter") {
-        console.log("L107 num1: "+num1);
-        evaluate(display.textContent);
+        numtext = display.textContent;
+        evaluate(numtext);
+        updateOperation(numtext);
+        equalSignLast = true;
+        equalSignIndForDec = true;
         lastKeyIsOperator = true;
         prevOp = false;
      } else {
