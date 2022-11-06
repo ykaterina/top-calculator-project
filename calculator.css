@@ -9,7 +9,7 @@ body {
     display: flex;
     height: fit-content;
     width: fit-content;
-    border: solid 1px black;
+    border: solid 2px black;
     padding: 10px;
     justify-content: center;
     background-color: #F5EFE6;
@@ -23,15 +23,24 @@ body {
     margin-bottom: 30px;
     padding: 5px;
     background-color: #7895B2;
+    border: solid 2px black;
     border-radius: 5px;
     color: aliceblue;
-    align-items: center;
     text-align: right;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
 }
 
-span {
+#history {
+    flex: 0 1 auto;
+    font-size: 1em;
+}
+
+#display {
     font-size: 2em;
-    vertical-align: middle;
+    font-size: 0 2 auto;
 }
 
 .keys-grid{
@@ -46,7 +55,7 @@ span {
     width: auto;
     font-size: 24px;
     background-color: #e8dfca;
-    border: solid 1px #b8a988;
+    border: solid 2px #695d43;
     border-radius: 5px;
 }
 
@@ -61,7 +70,7 @@ span {
     width: 70px;
     font-size: 24px;
     background-color: #AEBDCA;
-    border: solid 1px #839cb3;
+    border: solid 2px #4f5f6e;
     color: black;
     border-radius: 5px;
 }
